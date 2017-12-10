@@ -8,6 +8,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     int lowestNumber = minNumber;
     int highestNumber = maxNumber;
     private EditText inputNumber;
+
+    AdView mAdView;
 
     public void guessButton (View view)
     {
@@ -92,6 +98,40 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         textUpdate("The number is between "+ lowestNumber + " to " + highestNumber);
-        resetButton();
+        resetButton();// Prepare the Interstitial Ad
+
+        MobileAds.initialize(getApplicationContext(),
+                getString(R.string.banner_ad_unit_id));
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                // Check the LogCat to get your test device ID
+                .addTestDevice("7B5C90BA62D0D8B942FD8FF7225A1038")
+                .build();
+        mAdView.loadAd(adRequest);
+    }
+
+    @Override
+    public void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        super.onDestroy();
     }
 }
